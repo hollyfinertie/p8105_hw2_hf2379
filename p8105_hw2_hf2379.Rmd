@@ -21,6 +21,15 @@ trash_wheel_data = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xls
   mutate(sports_balls = round(sports_balls, digits=0)) %>% 
   mutate(sports_valls = as.integer(sports_balls))
 
+precipitation_2017 = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", 4, range = "A2:B14") %>% 
+  janitor::clean_names() %>% 
+  drop_na(total) %>% 
+  mutate(year = 2017)
+
+precipitation_2018 = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", 3, range = "A2:B14") %>% 
+  janitor::clean_names() %>% 
+  drop_na(total) %>% 
+  mutate(year = 2018)
 
 ```
 
