@@ -89,6 +89,18 @@ final_table_538 =
 From Five ThirtyEight, we imported 3 data sets. The first, pols_month, included information on the number of politicans per party affiliation by month and year from `r pols_month %>% summarize(min(year))` to `r pols_month %>% summarize(max(year))`. From this information, we created a new variable named `r pols_month %>% select(president) %>% colnames()` describing the party affiliation of the president at that date in time. Additionally, we imported a data set call snp containg the Standard & Poor’s stock market index (S&P) closing value at each date in time from `r snp %>% summarize(min(year))` to `r snp %>% summarize(max(year))` by month.  Last, we imported and tidied a data set with unemployment percentages by month and year from `r unemploy %>% summarize(min(year))` to `r unemploy %>% summarize(max(year))`. We used these three data sets to create a final table with `r final_table_538 %>% nrow()` observations and `r final_table_538 %>% ncol()` variables. It contains information on unemployment rates (`r final_table_538 %>% select(unemploy_perc) %>% colnames()`), the stock market index (`r final_table_538 %>% select(close) %>% colnames()`), and political affiliation of the president (`r final_table_538 %>% select(president) %>% colnames()`) by month and year from `r final_table_538 %>% summarize(min(year))` to `r final_table_538 %>% summarize(max(year))`. 
 
 
+# Problem 3: 
+
+```{r}
+baby_names = read.csv("./data/Popular_Baby_Names.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    child_s_first_name = str_to_title(child_s_first_name),
+    ethnicity = recode(ethnicity, "ASIAN AND PACI" = "ASIAN AND PACIFIC ISLANDER", "BLACK NON HISP" = "BLACK NON HISPANIC", "WHITE NON HISP" = "WHITE NON HISPANIC")) %>% 
+    distinct()
+
+
+```
 
 
 
