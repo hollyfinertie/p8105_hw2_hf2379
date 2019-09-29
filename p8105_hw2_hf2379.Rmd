@@ -99,6 +99,14 @@ baby_names = read.csv("./data/Popular_Baby_Names.csv") %>%
     ethnicity = recode(ethnicity, "ASIAN AND PACI" = "ASIAN AND PACIFIC ISLANDER", "BLACK NON HISP" = "BLACK NON HISPANIC", "WHITE NON HISP" = "WHITE NON HISPANIC")) %>% 
     distinct()
 
+olivia_ranking = 
+  baby_names %>%
+  filter(child_s_first_name == "Olivia") %>% 
+  group_by(year_of_birth, ethnicity) %>% 
+  summarize(rank) %>% 
+  pivot_wider(
+      names_from = year_of_birth,
+        values_from = rank)
 
 ```
 
