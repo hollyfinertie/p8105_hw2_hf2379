@@ -20,8 +20,9 @@ library(readxl)
 trash_wheel = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", 1, range = "A2:N338") %>% 
   janitor::clean_names() %>% 
   drop_na(dumpster) %>% 
-  mutate(sports_balls = round(sports_balls, digits=0)) %>% 
-  mutate(sports_balls = as.integer(sports_balls))
+  mutate(
+      sports_balls = round(sports_balls, digits=0), 
+      sports_balls = as.integer(sports_balls))
 
 precip_2017 = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", 4, range = "A2:B14") %>% 
   janitor::clean_names() %>% 
@@ -41,13 +42,10 @@ precip_combined_2017_2018 =
 Two data sets have been successfully imported and cleaned: (1) trash_wheel and (2) precip_both_years. 
 
 
-**trash_wheel**: This data set has `r trash_wheel %>% nrow()` observations and `r trash_wheel %>% ncol()` columns describing the weight and volume of trash pulled out of the Inner Harbor in Baltimore by month from `r trash_wheel %>%  select(year) %>% min()` to `r trash_wheel %>% select(year) %>% max()`. Additional variables describe the type of trash pulled (e.g. plastic bottles, cigarette butts, and sports balls). For example, in 2014 Mr. Trash Wheel pulled out `r trash_wheel %>% filter(year==2014) %>% select(weight_tons) %>% sum()` tons and `r trash_wheel %>% filter(year==2014) %>% select(volume_cubic_yards) %>% sum()` cubic yards of trash. Additionally, in 2017 the median number of sports balss in a dumpster pulled from Mr. Trash Wheel was `r trash_wheel %>% filter(year==2017) %>% mutate(balls=as.numeric(sports_balls)) %>% select(sports_balls) %>% min()`. 
+**trash_wheel**: This data set has `r trash_wheel %>% nrow()` observations and `r trash_wheel %>% ncol()` columns describing the weight and volume of trash pulled out of the Inner Harbor in Baltimore by month from `r trash_wheel %>%  select(year) %>% min()` to `r trash_wheel %>% select(year) %>% max()`. Additional variables describe the type of trash pulled (e.g. `r trash_wheel %>% select(plastic_bottles) %>% colnames()`, `r trash_wheel %>% select(cigarette_butts) %>% colnames()`, and `r trash_wheel %>% select(sports_balls) %>% colnames()`). For example, in 2014 Mr. Trash Wheel pulled out `r trash_wheel %>% filter(year==2014) %>% select(weight_tons) %>% sum()` tons and `r trash_wheel %>% filter(year==2014) %>% select(volume_cubic_yards) %>% sum()` cubic yards of trash. Additionally, in 2017 the median number of sports balss in a dumpster pulled from Mr. Trash Wheel was `r trash_wheel %>% filter(year==2017) %>% summarize(median(sports_balls))`. 
 
 **precip_both_years**: This data set has `r precip_combined_2017_2018 %>% nrow()` observations and `r precip_combined_2017_2018 %>% ncol()` columns describing the total precipation in inches by month from `r min(pull(precip_combined_2017_2018, year))` to `r precip_combined_2017_2018 %>% select(year) %>% max()`. For example, from the table we know that the precipitation in January 2018 was `r precip_combined_2017_2018 %>% filter(year==2018) %>% filter(month=="January") %>% select(total)` inches and total precipation in 2018 was `r precip_combined_2017_2018 %>% filter(year==2018) %>% select(total) %>% sum()`
 inches. 
-
-
-## REMEMBER YOU DIDN'T DO THE MEDIAN
 
 
 # Problem 2: 
@@ -75,21 +73,20 @@ snp = read_csv("./data/snp.csv") %>%
   mutate(month = month.name[month])
 
 unemploy = read_csv("./data/unemployment.csv") %>% 
-  janitor::clean_names() %>% 
-  pivot_longer(jan:dec, names_to = "month", values_to = "unemploy_perc") %>% 
+  pivot_longer(Jan:Dec, names_to = "month", values_to = "unemploy_perc") %>% 
   mutate(
-    month=recode(month, "jan"="January", "feb"="February", "mar"="March", "apr"="April", "may"="May", "jun"="June", "jul"="July", "aug"="Aug", "sep"="September", "oct"="October", "nov"="November", "dec"="December"))
-
+    month = match(month,month.abb),
+    month = month.name[month]) %>% 
+ janitor::clean_names()
+    
 snp_pols = 
   left_join(pols_month, snp, by = c("month" = "month", "year" = "year"))
 
 final_table_538 = 
     left_join(snp_pols, unemploy, by = c("month" = "month", "year" = "year"))
-
 ```
 
-
-
+From Five ThirtyEight, we imported 3 data sets. The first, pols_month, included information on the number of politicans per party affiliation by month and year from `r pols_month %>% summarize(min(year))` to `r pols_month %>% summarize(max(year))`. From this information, we created a new variable named `r pols_month %>% select(president) %>% colnames()` describing the party affiliation of the president at that date in time. Additionally, we imported a data set call snp containg the Standard & Poor’s stock market index (S&P) closing value at each date in time from `r snp %>% summarize(min(year))` to `r snp %>% summarize(max(year))` by month.  Last, we imported and tidied a data set with unemployment percentages by month and year from `r unemploy %>% summarize(min(year))` to `r unemploy %>% summarize(max(year))`. We used these three data sets to create a final table with `r final_table_538 %>% nrow()` observations and `r final_table_538 %>% ncol()` variables. It contains information on unemployment rates (`r final_table_538 %>% select(unemploy_perc) %>% colnames()`), the stock market index (`r final_table_538 %>% select(close) %>% colnames()`), and political affiliation of the president (`r final_table_538 %>% select(president) %>% colnames()`) by month and year from `r final_table_538 %>% summarize(min(year))` to `r final_table_538 %>% summarize(max(year))`. 
 
 
 
