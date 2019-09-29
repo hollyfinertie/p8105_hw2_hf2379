@@ -58,8 +58,7 @@ pols_month = read_csv("./data/pols-month.csv") %>%
       month = as.numeric(month),
       month = month.name[month],
       year = as.numeric(year),
-      president = recode(prez_gop, `1` = "gop", `2`="gop", `0`="dem")
-      ) %>% 
+      president = recode(prez_gop, `1` = "gop", `2`="gop", `0`="dem")) %>% 
   select(-day, -prez_gop, -prez_dem)
 
 snp = read_csv("./data/snp.csv") %>% 
@@ -117,6 +116,19 @@ first_ranked_males =
   pivot_wider(
         names_from = year_of_birth,
         values_from = child_s_first_name)
+
+plot_2016_white_males = 
+  baby_names %>% 
+  filter(
+    gender == "MALE", 
+    ethnicity == "WHITE NON HISPANIC", 
+    year_of_birth == 2016) %>% 
+  ggplot(aes(x = rank, y = count, )) +
+    geom_point()
+
+plot_2016_white_males
+
+    
 ```
 
 
