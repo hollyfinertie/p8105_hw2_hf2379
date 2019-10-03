@@ -12,14 +12,11 @@ library(tidyverse)
 
 # Problem 1: 
 
-## Read and clean data sets
-
 ```{r, warning = FALSE}
 library(readxl)
 
-trash_wheel = read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", 1) %>% 
+trash_wheel = read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", 1, range = "A2:N408") %>% 
   janitor::clean_names() %>% 
-  select(dumpster:homes_powered) %>% 
   drop_na(dumpster) %>% 
   mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
 
@@ -42,9 +39,9 @@ precip_combined_2017_2018 =
 Two data sets have been successfully imported and cleaned: (1) trash_wheel and (2) precip_both_years. 
 
 
-**Trash Wheel Data Set**: This data set has `r trash_wheel %>% nrow()` observations and `r trash_wheel %>% ncol()` variables describing the weight and volume of trash pulled out of the Inner Harbor in Baltimore by month from `r trash_wheel %>%  select(year) %>% min()` to `r trash_wheel %>% select(year) %>% max()`. Additional variables describe the type of trash pulled (e.g. `r trash_wheel %>% select(plastic_bottles) %>% colnames()`, `r trash_wheel %>% select(cigarette_butts) %>% colnames()`, and `r trash_wheel %>% select(sports_balls) %>% colnames()`). For example, in 2014 Mr. Trash Wheel pulled out `r trash_wheel %>% filter(year==2014) %>% select(weight_tons) %>% sum()` tons and `r trash_wheel %>% filter(year==2014) %>% select(volume_cubic_yards) %>% sum()` cubic yards of trash. Additionally, in 2017 the median number of sports balls in a dumpster pulled from Mr. Trash Wheel was `r trash_wheel %>% filter(year==2017) %>% summarize(median(sports_balls))`. 
+**Trash Wheel Data Set**: This data set has `r trash_wheel %>% nrow()` observations and `r trash_wheel %>% ncol()` variables describing the weight and volume of trash pulled out of the Inner Harbor in Baltimore by month from `r trash_wheel %>%  select(year) %>% min()` to `r trash_wheel %>% select(year) %>% max()`. Additional variables describe the type of trash pulled (e.g. ``r trash_wheel %>% select(plastic_bottles) %>% colnames()`, `r trash_wheel %>% select(cigarette_butts) %>% colnames()``, and ``r trash_wheel %>% select(sports_balls) %>% colnames()``). For example, in 2014 Mr. Trash Wheel pulled out `r trash_wheel %>% filter(year==2014) %>% select(weight_tons) %>% sum()` tons and `r trash_wheel %>% filter(year==2014) %>% select(volume_cubic_yards) %>% sum()` cubic yards of trash. Additionally, in 2017 the median number of sports balls in a dumpster pulled from Mr. Trash Wheel was `r trash_wheel %>% filter(year==2017) %>% summarize(median(sports_balls))`. 
 
-**Combined Precipitation Data Set**: This data set has `r precip_combined_2017_2018 %>% nrow()` observations and `r precip_combined_2017_2018 %>% ncol()` variables describing the total precipation in inches by month from `r min(pull(precip_combined_2017_2018, year))` to `r precip_combined_2017_2018 %>% select(year) %>% max()`. For example, from the table we know that the precipitation in January 2018 was `r precip_combined_2017_2018 %>% filter(year==2018) %>% filter(month=="January") %>% select(total)` inches and total precipation in 2018 was `r precip_combined_2017_2018 %>% filter(year==2018) %>% select(total) %>% sum()`
+**Combined Precipitation Data Set**: This data set has `r precip_combined_2017_2018 %>% nrow()` observations and `r precip_combined_2017_2018 %>% ncol()` variables describing the total precipation in inches by month from `r min(pull(precip_combined_2017_2018, year))` to `r precip_combined_2017_2018 %>% select(year) %>% max()`. The total precipation in 2018 was `r precip_combined_2017_2018 %>% filter(year==2018) %>% select(total) %>% sum()`
 inches. 
 
 
@@ -86,7 +83,7 @@ final_table_538 =
     left_join(snp_pols, unemploy, by = c("month" = "month", "year" = "year"))
 ```
 
-From Five ThirtyEight, we imported 3 data sets. The first, 'pols_month', included information on the number of politicans per party affiliation by month and year from `r pols_month %>% summarize(min(year))` to `r pols_month %>% summarize(max(year))`. From this information, we created a new variable named `r pols_month %>% select(president) %>% colnames()` describing the party affiliation of the president at that date in time. Additionally, we imported a data set call 'snp' containg the Standard & Poor’s stock market index (S&P) closing value at each date in time from `r snp %>% summarize(min(year))` to `r snp %>% summarize(max(year))` by month.  Last, we imported and tidied a data set called 'unemploy' with unemployment percentages by month and year from `r unemploy %>% summarize(min(year))` to `r unemploy %>% summarize(max(year))`. We used these three data sets to create a final table with `r final_table_538 %>% nrow()` observations and `r final_table_538 %>% ncol()` variables with the key variables being 'year' and 'month'.
+From Five ThirtyEight, we imported 3 data sets. The first, `pols_month`, included information on the number of politicans per party affiliation by month and year from `r pols_month %>% summarize(min(year))` to `r pols_month %>% summarize(max(year))`. Using this data, we created a new variable named ``r pols_month %>% select(president) %>% colnames()`` describing the party affiliation of the president at that date in time. Additionally, we imported a data set call `snp` containg the Standard & Poor’s stock market index (S&P) closing value at each date in time from `r snp %>% summarize(min(year))` to `r snp %>% summarize(max(year))` by month.  Last, we imported and tidied a data set called `unemploy` with unemployment percentages by month and year from `r unemploy %>% summarize(min(year))` to `r unemploy %>% summarize(max(year))`. We used these three data sets to create a final table with `r final_table_538 %>% nrow()` observations and `r final_table_538 %>% ncol()` variables with the key variables being `year` and `month`.
 
 
 # Problem 3: 
@@ -96,13 +93,13 @@ baby_names = read.csv("./data/Popular_Baby_Names.csv") %>%
   janitor::clean_names() %>% 
   mutate(
     child_s_first_name = str_to_title(child_s_first_name),
+    ethnicity = str_to_lower(ethnicity),
+    gender = str_to_lower(gender),
     ethnicity = 
         recode(
-          ethnicity, "ASIAN AND PACI" = "ASIAN AND PACIFIC ISLANDER", 
-              "BLACK NON HISP" = "BLACK NON HISPANIC", "WHITE NON HISP" = 
-              "WHITE NON HISPANIC"),
-    ethnicity = str_to_lower(ethnicity),
-    gender = str_to_lower(gender)) %>% 
+          ethnicity, "asian and paci" = "asian and pacific islander", 
+              "black non hisp" = "black non hispanic", "white non hisp" = 
+              "white non hispanic")) %>% 
     distinct()
 
 olivia_ranking = 
